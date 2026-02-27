@@ -9,10 +9,12 @@ Guide to creating a PXE booted Kali Linux.
   `sudo apt install -y build-essential git syslinux-common`  
   `sudo apt install -y isc-dhcp-server tftpd-hpa`
 
-### 2. Mount ISO and copy files
+### 2. Download and mount ISO and copy files
 ```bash
+cd ~/Downloads
+wget https://kali.download/kali-images/kali-2025.1/kali-linux-2025.1-live-amd64.iso
 sudo mkdir /mnt/kali-iso
-sudo mount -o loop kali-linux-2025.1-live-amd64.iso /mnt/kali-iso
+sudo mount -o loop ~/Downloads/kali-linux-2025.2-live-amd64.iso /mnt/kali-iso
 sudo mkdir -p /srv/tftp/kali
 sudo cp /mnt/kali-iso/live/{vmlinuz,initrd.img,filesystem.squashfs} /srv/tftp/kali/
 sudo umount /mnt/kali-iso
