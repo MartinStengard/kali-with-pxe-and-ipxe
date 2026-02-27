@@ -9,7 +9,7 @@ Guide to creating a iPXE booted Kali Linux.
   `sudo apt install -y build-essential git syslinux-common`  
   `sudo apt install -y apache2 isc-dhcp-server tftpd-hpa`
 
-### 1. Web server
+### 2. Web server
 The files for the boot process need to be availabe through a HTTP resource. 
 We solve it by using `apache2` web server on the host machine.
 
@@ -19,7 +19,7 @@ sudo apt install apache2
 ```
 Root folder for the `apache2` web server is `/var/www/html`.
 
-### 2. Download and mount ISO and copy files
+### 3. Download and mount ISO and copy files
 ```bash
 cd ~/Downloads
 wget https://kali.download/kali-images/kali-2025.1/kali-linux-2025.1-live-amd64.iso
@@ -31,7 +31,7 @@ sudo cp /mnt/kali-iso/live/initrd.img /var/www/html/kali/
 sudo cp /mnt/kali-iso/live/filesystem.squashfs /var/www/html/kali/
 ```
 
-### 3. DHCP
+### 4. DHCP
 Use `host-only` for the machine's network adapter. By default, the virtual interface `vmnet1` on the host machine is used.  
 
 In `dhcpd.conf`, the IP address of the virtual network interface `vmnet1` (e.g. `192.168.185.1`) should be used, 
@@ -96,7 +96,7 @@ sudo vi /etc/default/isc-dhcp-server
 INTERFACESv4="vmnet1"
 ```
 
-### 4. TFTP
+### 5. TFTP
 TFTP is used to download all the files needed to start Kali.  
 
 #### Installation
@@ -118,7 +118,7 @@ TFTP_OPTIONS="--secure --create --verbose --blocksize 1024"
 #### Firewall
 Make sure that any firewall is not blocking traffic to `port 69 UDP`.
 
-### 5. Build iPXE file for UEFI
+### 6. Build iPXE file for UEFI
 ```bash
 git clone https://github.com/ipxe/ipxe.git
 cd ipxe/src
@@ -131,7 +131,7 @@ sudo cp bin-x86_64-efi/ipxe.efi /mnt/kali-iso/
 sudo cp bin-x86_64-efi/ipxe.efi /var/www/html/
 ```
 
-### 6. Create iPXE script
+### 7. Create iPXE script
 Create `boot.ipxe` with configurations on the web server. Below to versions are tested successfully.  
 ```bash
 sudo vi /var/www/html/boot.ipxe  
@@ -150,14 +150,14 @@ initrd http://192.168.185.1/kali/initrd.img
 boot
 ```
 
-### 7. Start services
+### 8. Start services
 There are three different services that need to be started for everything to work. These are the web server, dhcp and tftp services.
 ```bash
 sudo systemctl restart apache2 isc-dhcp-server tftpd-hpa
 sudo systemctl enable apache2 isc-dhcp-server tftpd-hpa
 ```
 
-### 8. Client configuration
+### 9. Client configuration
 There are some settings for the PXE machine that need to be set in VMware Workstation.
 - **Network Adapter** → `host-only`
 - **PXE-boot** → `UEFI`  
@@ -171,7 +171,7 @@ There are some settings for the PXE machine that need to be set in VMware Workst
   If large files can't be loaded add below line in the `.vmx` file:  
   `ethernet0.virtualDev = "e1000"`
 
-### 9. Troubleshooting
+### 10. Troubleshooting
 - **Firewall** 
   → Make sure that traffic to `69 UDP` and `80 TCP` is allowed - or turn off the firewall.
 - **Timeout**
